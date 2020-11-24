@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		8D01CCCA0486CAD60068D4B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D02B270256BF91D00A12F10 /* NRLinkPIInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8D02B26E256BF91D00A12F10 /* NRLinkPIInit.cpp */; };
-		8D02B271256BF91D00A12F10 /* NRLinkPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8D02B26F256BF91D00A12F10 /* NRLinkPI.cpp */; };
 		8D04EEBF221EB7AF00EF717F /* PIMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8D04EEBE221EB7AF00EF717F /* PIMain.cpp */; };
 		8D888C17220DD9B500FAE38C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D888C16220DD9B500FAE38C /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -17,9 +16,7 @@
 /* Begin PBXFileReference section */
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
 		8D01CCD20486CAD60068D4B7 /* NRLinkPI.acroplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NRLinkPI.acroplugin; sourceTree = BUILT_PRODUCTS_DIR; };
-		8D02B26D256BF91D00A12F10 /* NRLinkPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NRLinkPI.h; path = ../sources/NRLinkPI.h; sourceTree = "<group>"; };
 		8D02B26E256BF91D00A12F10 /* NRLinkPIInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NRLinkPIInit.cpp; path = ../sources/NRLinkPIInit.cpp; sourceTree = "<group>"; };
-		8D02B26F256BF91D00A12F10 /* NRLinkPI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NRLinkPI.cpp; path = ../sources/NRLinkPI.cpp; sourceTree = "<group>"; };
 		8D04EEBE221EB7AF00EF717F /* PIMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PIMain.cpp; path = ../Headers/API/PIMain.cpp; sourceTree = "<group>"; };
 		8D888BE1220CD23800FAE38C /* Default.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Default.xcconfig; path = ../Headers/SDK/MacSDKConfigurations/Default.xcconfig; sourceTree = "<group>"; };
 		8D888BE2220CD23800FAE38C /* Environment.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Environment.xcconfig; path = ../Headers/SDK/MacSDKConfigurations/Environment.xcconfig; sourceTree = "<group>"; };
@@ -55,8 +52,6 @@
 		08FB77ADFE841716C02AAC07 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				8D02B26F256BF91D00A12F10 /* NRLinkPI.cpp */,
-				8D02B26D256BF91D00A12F10 /* NRLinkPI.h */,
 				8D02B26E256BF91D00A12F10 /* NRLinkPIInit.cpp */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 				8D04EEBE221EB7AF00EF717F /* PIMain.cpp */,
@@ -182,7 +177,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D02B270256BF91D00A12F10 /* NRLinkPIInit.cpp in Sources */,
-				8D02B271256BF91D00A12F10 /* NRLinkPI.cpp in Sources */,
 				8D04EEBF221EB7AF00EF717F /* PIMain.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
