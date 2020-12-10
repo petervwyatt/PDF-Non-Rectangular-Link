@@ -20,7 +20,7 @@ ASBool gToolSelected;
 AVToolRec gTool;
 AVDevCoord gXPoints[1000];
 AVDevCoord gYPoints[1000];
-int gNumPoints;
+ASUns32 gNumPoints;
 
 
 static ACCB1 ASAtom ACCB2 ToolGetType(AVTool tool) {
@@ -104,39 +104,89 @@ static ASBool ToolDoKeyDown(AVTool tool, AVKeyCode key, AVFlagBits16 flags) {
 ACCB1 void ACCB2 myAVAppRegisterForPageViewDrawingProc(AVPageView pageView,
 	AVDevRect* updateRect, void* data)
 {
-  AVDevCoord xPoints[1000];
-  AVDevCoord yPoints[1000];
-  int numPoints;
-  PDColorValueRec color;
-  color.space = PDDeviceRGB;
-  color.value[0] = 0;
-  color.value[1] = 0xffff;
-  color.value[2] = 0;
-  AVPageViewSetColor(pageView, &color);
-
   PDPage page = AVPageViewGetPage(pageView);
+  CosDoc cosDoc = PDDocGetCosDoc(PDPageGetDoc(page));
   AVPageViewBeginOperation(pageView);
   for (int i = 0; i < PDPageGetNumAnnots(page); i++) {
     PDAnnot annot = PDPageGetAnnot(page, i);
     if (PDAnnotGetSubtype(annot) == ASAtomFromString("Link")) {
-      numPoints = 0;
       CosObj cosAnnot = PDAnnotGetCosObj(annot);
       CosObj cosPath = CosDictGet(cosAnnot, ASAtomFromString("Path"));
-      if (!CosObjEqual(cosPath, CosNewNull()))
-        // have Link annotation with Path entry. Going to render the path segments
+      ASFixedRect fixedBBox;
+      fixedBBox.left = ASInt16ToFixed(10000);
+      fixedBBox.right = ASInt16ToFixed(0);
+      fixedBBox.bottom = ASInt16ToFixed(10000);
+      fixedBBox.top = ASInt16ToFixed(0);
+
+      auto setminmaxX = [&](ASFixed x) {
+        if (x < fixedBBox.left) fixedBBox.left = x;
+        if (x > fixedBBox.right) fixedBBox.right = x;
+        return ASFixedToFloat(x);
+      };
+      auto setminmaxY = [&](ASFixed y) {
+        if (y < fixedBBox.bottom) fixedBBox.bottom = y;
+        if (y > fixedBBox.top) fixedBBox.top = y;
+        return ASFixedToFloat(y);
+      };
+
+      char buf[2048], buf2[2048];
+      memset(&buf, 0, sizeof(buf));
+      strcat(buf, "q 1 w 0 1 0 RG ");
+      if (!CosObjEqual(cosPath, CosNewNull())) {
+        // have Link annotation with Path entry. 
+        // Going to generate content stream from the path segments 
         for (int pathIndex = 0; pathIndex < CosArrayLength(cosPath); pathIndex++) {
           CosObj cosArray = CosArrayGet(cosPath, pathIndex);
-          ASFixedPoint pagePoint;
-          AVDevCoord x,y;
-          pagePoint.h = CosFixedValue(CosArrayGet(cosArray, 0));
-          pagePoint.v = CosFixedValue(CosArrayGet(cosArray, 1));
-          AVPageViewPointToDevice(pageView, &pagePoint, &x, &y );
-          xPoints[numPoints] = x;
-          yPoints[numPoints] = y;
-          numPoints++;
+          int numNumbers = CosArrayLength(cosArray);
+          sprintf(buf2, " %f %f",
+            setminmaxX(CosFixedValue(CosArrayGet(cosArray, 0))),
+            setminmaxY(CosFixedValue(CosArrayGet(cosArray, 1)))
+          );
+          strcat(buf, buf2);
+          if (numNumbers == 6) {
+            sprintf(buf2, " %f %f %f %f",
+              setminmaxX(CosFixedValue(CosArrayGet(cosArray, 2))),
+              setminmaxY(CosFixedValue(CosArrayGet(cosArray, 3))),
+              setminmaxX(CosFixedValue(CosArrayGet(cosArray, 4))),
+              setminmaxY(CosFixedValue(CosArrayGet(cosArray, 5)))
+            );
+            strcat(buf, buf2);
+          }
+          // 2 entries means l=line
+          // 6 entries means c=bezier
+          // first element has 2 entries and means m=moveto
+          if (numNumbers == 2)
+            if (pathIndex == 0)
+              strcat(buf, " m ");
+            else
+              strcat(buf, " l ");
+          else strcat(buf, " c ");
         }
-      if (numPoints!=0)
-        AVPageViewDrawPolygonOutline(pageView, xPoints, yPoints, numPoints, false);
+      }
+      strcat (buf," S Q");
+      ASUns32 bufferLen = (ASUns32)strlen(buf);
+
+      // generating form XObject to render it with AVPageViewDrawCosObj
+      ASStm stm = ASMemStmRdOpen(buf, bufferLen);
+      CosObj attributesDict = CosNewDict(cosDoc, false, 5);
+      CosDictPutKeyString(attributesDict, "Length", 
+        CosNewInteger(cosDoc, false, bufferLen));
+      CosObj formObj = CosNewStream(cosDoc, true, stm, 0, true, attributesDict, CosNewNull(), bufferLen);
+      CosObj stmDictObj = CosStreamDict(formObj);
+      CosDictPutKeyString(stmDictObj, "Type", CosNewNameFromString(cosDoc, false, "XObject"));
+      CosDictPutKeyString(stmDictObj, "Subtype", CosNewNameFromString(cosDoc, false, "Form"));
+
+      CosObj bboxObj = CosNewArray(cosDoc, false, 4L);
+      CosArrayInsert(bboxObj, 0, CosNewFixed(cosDoc, false, fixedBBox.left));
+      CosArrayInsert(bboxObj, 1, CosNewFixed(cosDoc, false, fixedBBox.bottom));
+      CosArrayInsert(bboxObj, 2, CosNewFixed(cosDoc, false, fixedBBox.right));
+      CosArrayInsert(bboxObj, 3, CosNewFixed(cosDoc, false, fixedBBox.top));
+      CosDictPutKeyString(stmDictObj, "BBox", bboxObj);
+      AVDevRect rect;
+//      AVPageViewGetAnnotRect(pageView, annot, &rect);
+      AVPageViewRectToDevice(pageView, &fixedBBox, &rect);
+      AVPageViewDrawCosObj(pageView, formObj, &rect);
+      CosObjDestroy(formObj);
     }
   }
   AVPageViewEndOperation(pageView);
