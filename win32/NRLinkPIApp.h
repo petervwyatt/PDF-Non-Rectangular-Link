@@ -9,8 +9,6 @@
 #error include 'stdafx.h' before including this file for PCH
 #endif
 
-//#include "resource.h"       // main symbols
-
 /////////////////////////////////////////////////////////////////////////////
 // CNRLinkPIApp:
 // See CNRLinkPIApp.cpp for the implementation of this class

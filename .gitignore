@@ -15,6 +15,7 @@
 *.so
 *.dylib
 *.dll
+*.api
 
 # Fortran module files
 *.mod
@@ -30,3 +31,6 @@
 *.exe
 *.out
 *.app
+
+win32/Win32
+win32/.vs

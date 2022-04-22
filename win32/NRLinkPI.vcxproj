@@ -57,13 +57,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.api</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
-    <OutDir>..\bin</OutDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.api</TargetExt>
-    <OutDir>c:\Program Files (x86)\Adobe\Acrobat DC\Acrobat\plug_ins\</OutDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)d</TargetName>
     <LinkIncremental>false</LinkIncremental>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -86,7 +88,7 @@
       <AdditionalIncludeDirectories>.\;..\sources;..\Headers;..\Headers\SDK;..\Headers\API;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>NDEBUG;WIN_PLATFORM;WIN32;_WINDOWS;WIN_ENV;ACRO_SDK_LEVEL=0x000A0000;PI_ACROCOLOR_VERSION=0x00060000;PDMETADATA_HFT=1;PLUGIN=1;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN_PLATFORM;WIN32;_WINDOWS;WIN_ENV;ACRO_SDK_LEVEL=0x000A0000;PI_ACROCOLOR_VERSION=0x00060000;PDMETADATA_HFT=1;PLUGIN=1;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -95,13 +97,22 @@
       <AdditionalOptions>/EXPORT:PlugInMain %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>..\bin\NRLinkPI.api</OutputFile>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <Bscmake>
       <OutputFile>$(IntDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>if not "%SDKPIDir%"a == ""a if not exist "%SDKPIDir%" mkdir "%SDKPIDir%"
+if not "%SDKPIDir%"a == ""a copy "$(targetpath)" "%SDKPIDir%"
+if not "%SDKPIDir%"a == ""a echo "$(targetname)" copied to "%SDKPIDir%".
+if "%SDKPIDir%"a == ""a echo not performed. SDKPIDir environment variable not set.
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy to Acrobat Plug-ins...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -124,7 +135,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <PreprocessorDefinitions>_DEBUG;WIN_PLATFORM;WIN32;_WINDOWS;WIN_ENV;ACRO_SDK_LEVEL=0x000A0000;PI_ACROCOLOR_VERSION=0x00060000;PDMETADATA_HFT=1;PLUGIN=1;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN_PLATFORM;WIN32;_WINDOWS;WIN_ENV;ACRO_SDK_LEVEL=0x000A0000;PI_ACROCOLOR_VERSION=0x00060000;PDMETADATA_HFT=1;PLUGIN=1;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -135,7 +146,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <OutputFile>c:\Program Files (x86)\Adobe\Acrobat DC\Acrobat\plug_ins\NRLinkPId.api</OutputFile>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>
@@ -145,6 +155,16 @@
       <OutputFile>$(IntDir)$(TargetName).bsc</OutputFile>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>if not "%SDKPIDir%"a == ""a if not exist "%SDKPIDir%" mkdir "%SDKPIDir%"
+if not "%SDKPIDir%"a == ""a copy "$(targetpath)" "%SDKPIDir%"
+if not "%SDKPIDir%"a == ""a echo "$(targetname)" copied to "%SDKPIDir%".
+if "%SDKPIDir%"a == ""a echo not performed. SDKPIDir environment variable not set.
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy to Acrobat Plug-ins...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
